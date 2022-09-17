@@ -5,6 +5,8 @@ VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetingNotesProcessor", "MeetingNotesProcessor\MeetingNotesProcessor.csproj", "{821DF224-F218-44F2-87AB-8F06D3EFA540}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailProcessor", "EmailProcessor\EmailProcessor.csproj", "{9BC3916C-0D2E-4275-B00C-8FAC298CE5F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{821DF224-F218-44F2-87AB-8F06D3EFA540}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{821DF224-F218-44F2-87AB-8F06D3EFA540}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{821DF224-F218-44F2-87AB-8F06D3EFA540}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BC3916C-0D2E-4275-B00C-8FAC298CE5F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BC3916C-0D2E-4275-B00C-8FAC298CE5F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BC3916C-0D2E-4275-B00C-8FAC298CE5F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BC3916C-0D2E-4275-B00C-8FAC298CE5F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
