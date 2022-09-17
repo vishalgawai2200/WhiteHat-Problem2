@@ -13,15 +13,22 @@ namespace MeetingNotesProcessor.Model
             //MinuteOfMeeting = minuteOfMeeting;
             Subject = string.Empty;
             Created = DateTime.Now;
-            Participants = new List<Participant>();
-            MinuteOfMeeting = new List<Note>();
+            Participants = String.Empty;
+            MinuteOfMeeting = String.Empty;
+            //Participants = new List<Participant>();
+            //MinuteOfMeeting = new List<Note>();
         }
 
         [Key]
         public long SessionId { get; set; }
         public string Subject { get; set; }
-        public List<Participant> Participants { get; set; }
-        public List<Note> MinuteOfMeeting { get; set; }
+
+        public string Participants { get; set; }
+
+        public string MinuteOfMeeting { get; set; }
+
+        //public List<Participant> Participants { get; set; }
+        //public List<Note> MinuteOfMeeting { get; set; }
         public DateTime Created { get; set; }
 
         //- Subject/Topic

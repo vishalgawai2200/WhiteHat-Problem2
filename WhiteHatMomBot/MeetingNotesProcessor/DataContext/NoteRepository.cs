@@ -2,6 +2,9 @@
 using MeetingNotesProcessor.DataContext;
 using MeetingNotesProcessor.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using System.Reflection.Emit;
+using static Azure.Core.HttpHeader;
 
 namespace EFCoreInMemoryDbDemo
 {
@@ -42,7 +45,15 @@ namespace EFCoreInMemoryDbDemo
         {
             using var context = new ApiContext();
             var note = context.Minutes?.FirstOrDefault(x => x.SessionId == sessionId);
-            note?.MinuteOfMeeting.Add(new Note( 1, minute ));
+            //Minutes.Property(e => e.PostId).ValueGeneratedNever();
+            note.MinuteOfMeeting += minute;      
+            
+            
+            //context.Minutes.Add(note);
+
+            
+            //context?.Minutes?.Remove(note);
+            //note.Entity<Note>().Property(e => e.Id).ValueGeneratedNever();
             //context.Notes.Add(new Note { SessionId = maxId + 1, Subject = subject, MinuteOfMeeting = minutes, Created = DateTime.Now, Participants = "Saurabh" });
             context.SaveChanges();
             
@@ -67,9 +78,15 @@ namespace EFCoreInMemoryDbDemo
 
         public bool DeleteNote(long sessionId, int index)
         {
+            
+           
+
             using var context = new ApiContext();
-            var note = context.Minutes?.FirstOrDefault(x => x.SessionId == sessionId);
-            note?.MinuteOfMeeting.RemoveAt(index);
+            var note = context.Minutes?.FirstOrDefault(x => x.SessionId == sessionId);            
+            
+            //note?.MinuteOfMeeting.RemoveAt(index);
+
+            context.SaveChanges();
 
             return true;
         }
