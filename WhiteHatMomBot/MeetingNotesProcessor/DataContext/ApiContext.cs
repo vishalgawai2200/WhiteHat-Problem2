@@ -1,5 +1,6 @@
 ﻿using MeetingNotesProcessor.Model;
 using Microsoft.EntityFrameworkCore;
+
 namespace MeetingNotesProcessor.DataContext
 {
     public class ApiContext : DbContext
@@ -8,8 +9,19 @@ namespace MeetingNotesProcessor.DataContext
         {
             optionsBuilder.UseInMemoryDatabase(databaseName: "MinutesDB");
         }
-        public DbSet<Minutes>? Minutes { get; set; }
-        public DbSet<Participant>? Participants { get; set; }
-        public DbSet<Note>? Notes { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Minute>()
+                        //.HasNoKey()                        
+                        .Property(e => e.Notes)                        
+                        .HasConversion(
+                            v => string.Join(',', v),
+                            v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList());
+
+               // .HasNoKey();
+        }
+
+        public DbSet<Minute> Minutes { get; set; }
     }
 }

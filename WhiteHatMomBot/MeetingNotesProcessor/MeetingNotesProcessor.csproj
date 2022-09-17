@@ -10,6 +10,8 @@
     <Compile Remove="Controllers\WeatherForecastController.cs" />
     <Compile Remove="MeetingNote.cs" />
     <Compile Remove="Minutes.cs" />
+    <Compile Remove="Model\Note.cs" />
+    <Compile Remove="Model\Participant.cs" />
     <Compile Remove="WeatherForecast.cs" />
   </ItemGroup>
 

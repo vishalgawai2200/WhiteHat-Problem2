@@ -4,64 +4,63 @@ using MeetingNotesProcessor.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using System.Reflection.Emit;
+using System.Runtime.Intrinsics.Arm;
 using static Azure.Core.HttpHeader;
 
 namespace EFCoreInMemoryDbDemo
 {
     public class NoteRepository : INoteRepository
     {
-        public NoteRepository()
+        public bool AddNote(long sessionId, string note)
         {
-            //using (var context = new ApiContext())
-            //{
-            //    var notes = new List<Note>
-            //    {
-            //        new Note
-            //        {
-            //            Id= 1,
-            //            Participants = "Saurabh, Vishal" ,
-            //            Subject = "Imp thing to consider to participate in Hackathon",
-            //            //Participants = new string[] { "Saurabh" , "Vishal" },
-            //            //MinuteOfMeeting = new string[] { "Step 1 ", "Step 2", "Step 3" }
-            //            MinuteOfMeeting = "Step 1, Step 2, Step 3"
-            //        }
-            //    };
-            //    context.Notes.AddRange(notes);
-            //    context.SaveChanges();
-            //}
+            if (sessionId <= 0)
+                return false;
+
+            try
+            {
+                using var context = new ApiContext();
+                var minute = context.Minutes?.FirstOrDefault(x => x.SessionId == sessionId);
+
+                //Create SessionId if doesn't exists
+                if(minute == null)
+                {
+                    minute = new Minute(sessionId);
+                    context.Minutes?.Add(minute);
+                    context.SaveChanges();
+                }
+
+                if(!string.IsNullOrEmpty(note))
+                {
+                    minute.Notes.Add(note);
+                    context.Minutes?.Update(minute);
+                    context.SaveChanges();
+                }
+
+                return true;
+            }
+            catch(Exception)
+            {
+                return false;
+            }
         }
 
-        public bool Init(long sessionId, string subject, List<Participant> participants)
+        public bool DeleteNote(long sessionId, int noteIndex)
         {
             using var context = new ApiContext();
-            //long maxId = context.Notes.Max(x => x.SessionId);            
-            context.Minutes?.Add(new Minutes(sessionId));
-            context.SaveChanges();
+            var minute = context.Minutes?.FirstOrDefault(x => x.SessionId == sessionId);
+            
+            if (minute == null || minute.Notes.Count < noteIndex) 
+                return false;
+            
+            minute.Notes.RemoveAt(noteIndex);
+            context.Minutes?.Update(minute);
+            context.SaveChanges();           
 
             return true;
         }
 
-        public bool AddNote(long sessionId, string minute)
-        {
-            using var context = new ApiContext();
-            var note = context.Minutes?.FirstOrDefault(x => x.SessionId == sessionId);
-            //Minutes.Property(e => e.PostId).ValueGeneratedNever();
-            note.MinuteOfMeeting += minute;      
-            
-            
-            //context.Minutes.Add(note);
-
-            
-            //context?.Minutes?.Remove(note);
-            //note.Entity<Note>().Property(e => e.Id).ValueGeneratedNever();
-            //context.Notes.Add(new Note { SessionId = maxId + 1, Subject = subject, MinuteOfMeeting = minutes, Created = DateTime.Now, Participants = "Saurabh" });
-            context.SaveChanges();
-            
-            return true;
-        }
-
-        public Minutes? GetNote(long sessionId)
-        {
+        public Minute? GetNote(long sessionId)
+        {  
             using var context = new ApiContext();
             var note = context.Minutes?.FirstOrDefault(x => x.SessionId == sessionId);
             return note;
@@ -71,24 +70,17 @@ namespace EFCoreInMemoryDbDemo
         {
             using var context = new ApiContext();
             var note = context.Minutes?.FirstOrDefault(x => x.SessionId == sessionId);
-            // Call Email Service
+            // Call Email Service            
 
             return true;
         }
 
-        public bool DeleteNote(long sessionId, int index)
+        public IEnumerable<Minute> GetNotes()
         {
-            
-           
-
             using var context = new ApiContext();
-            var note = context.Minutes?.FirstOrDefault(x => x.SessionId == sessionId);            
-            
-            //note?.MinuteOfMeeting.RemoveAt(index);
-
-            context.SaveChanges();
-
-            return true;
+            var list = context.Minutes
+                .ToList();
+            return list;
         }
 
         public bool ClearSessions()
@@ -97,13 +89,6 @@ namespace EFCoreInMemoryDbDemo
             //context.Notes.
 
             return true;
-        }
-        public IEnumerable<Minutes> GetNotes()
-        {
-            using var context = new ApiContext();
-            var list = context.Minutes
-                .ToList();
-            return list;
         }
     }
 }

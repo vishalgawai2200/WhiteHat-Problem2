@@ -21,17 +21,10 @@ namespace MeetingNotesProcessor.Controllers
         }
 
         [HttpPost]
-        [ActionName("Init")]
-        public ActionResult Init(long sessionId, string subject, List<Participant> participants)
-        {            
-            return Ok(_noteRepository.Init(sessionId, subject, participants));
-        }
-
-        [HttpPost]
         [ActionName("AddNote")]
-        public ActionResult AddNote(long sessionId, string minute)
+        public ActionResult AddNote(long sessionId, string note)
         {            
-            return Ok(_noteRepository.AddNote(sessionId, minute));
+            return Ok(_noteRepository.AddNote(sessionId, note));
         }
 
         [HttpDelete]
@@ -43,7 +36,7 @@ namespace MeetingNotesProcessor.Controllers
 
         [HttpGet]
         [ActionName("GetNote")]
-        public ActionResult<Minutes> GetNote(long sessionId)
+        public ActionResult<Minute> GetNote(long sessionId)
         {
             return Ok(_noteRepository.GetNote(sessionId));            
         }
@@ -57,7 +50,7 @@ namespace MeetingNotesProcessor.Controllers
 
         [HttpGet]
         [ActionName("GetNotes")]
-        public ActionResult<IEnumerable<Minutes>> GetNotes()
+        public ActionResult<IEnumerable<Minute>> GetNotes()
         {
             return Ok(_noteRepository.GetNotes());
         }
