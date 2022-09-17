@@ -1,47 +1,75 @@
+using MeetingNotesProcessor.DataContext;
+using MeetingNotesProcessor.Model;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
 
 namespace MeetingNotesProcessor.Controllers
 {
     [ApiController]
     [Route("/[controller]/[action]")]
-    public class MeetingNotesController : ControllerBase
+    public class NotesController : ControllerBase
     {
-       private readonly ILogger<MeetingNotesController> _logger;
+        private readonly ILogger<NotesController> _logger;
 
-        private static Dictionary<int, string> _notes;
-       
+        private readonly INoteRepository _noteRepository;
 
-        public MeetingNotesController(ILogger<MeetingNotesController> logger)
+
+        public NotesController(INoteRepository noteRepository, ILogger<NotesController> logger)
         {
             _logger = logger;
-            _notes = new Dictionary<int, string>();
+            _noteRepository = noteRepository;
+        }
+
+        [HttpPost]
+        [ActionName("Init")]
+        public ActionResult Init(long sessionId, string subject, List<Participant> participants)
+        {            
+            return Ok(_noteRepository.Init(sessionId, subject, participants));
+        }
+
+        [HttpPost]
+        [ActionName("AddNote")]
+        public ActionResult AddNote(long sessionId, string minute)
+        {            
+            return Ok(_noteRepository.AddNote(sessionId, minute));
+        }
+
+        [HttpDelete]
+        [ActionName("DeleteNote")]
+        public ActionResult<bool> DeleteNote(long sessionId, int index)
+        {            
+            return Ok(_noteRepository.DeleteNote(sessionId, index));
+        }
+
+        [HttpGet]
+        [ActionName("GetNote")]
+        public ActionResult<Minutes> GetNote(long sessionId)
+        {
+            return Ok(_noteRepository.GetNote(sessionId));            
+        }
+
+        [HttpGet]
+        [ActionName("EmailNote")]
+        public ActionResult<bool> EmailNote(long sessionId)
+        {            
+            return Ok(_noteRepository.EmailNote(sessionId));            
         }
 
         [HttpGet]
         [ActionName("GetNotes")]
-        public IEnumerable<MeetingNote> GetNotes()
-        {            
-            foreach(var note in _notes) 
-            {
-                yield return new MeetingNote
-                {
-                    Id = note.Key,
-                    Note = note.Value
-                };
-            }
-        }
-
-
-        [HttpPost]
-        [ActionName("AddNotes")]
-        public void AddNote(string msg)
+        public ActionResult<IEnumerable<Minutes>> GetNotes()
         {
-            int id = _notes.Count() + 1;
-            _notes.Add(id, msg);
-
-            return;
-            
+            return Ok(_noteRepository.GetNotes());
         }
 
+        //[HttpPost]
+        //[ActionName("AddNotes")]
+        //public void AddNote(string msg)
+        //{
+        //    int id = _notes.Count() + 1;
+        //    _notes.Add(id, msg);
+
+        //    return;            
+        //}
     }
 }
