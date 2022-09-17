@@ -43,5 +43,15 @@ namespace MeetingNotesProcessor.Controllers
             
         }
 
+        [HttpPost]
+        [ActionName("EmailMinutesOfMeeting")]
+        public void EmailMinutesOfMeeting(string subject)
+        {
+          EmailSender.SendMail(subject);
+
+        }
+
+
+
     }
 }
