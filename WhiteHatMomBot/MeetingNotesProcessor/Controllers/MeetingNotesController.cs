@@ -62,14 +62,15 @@ namespace MeetingNotesProcessor.Controllers
             return Ok(_noteRepository.GetNotes());
         }
 
-        //[HttpPost]
-        //[ActionName("AddNotes")]
-        //public void AddNote(string msg)
-        //{
-        //    int id = _notes.Count() + 1;
-        //    _notes.Add(id, msg);
+        [HttpPost]
+        [ActionName("EmailMinutesOfMeeting")]
+        public void EmailMinutesOfMeeting(string subject)
+        {
+          EmailSender.SendMail(subject);
 
-        //    return;            
-        //}
+        }
+
+
+
     }
 }
