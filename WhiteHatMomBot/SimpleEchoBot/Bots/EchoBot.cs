@@ -92,7 +92,7 @@ namespace SimpleEchoBot.Bots
                         break;
                 }
 
-                result = "Sucess: " + result;
+                result = "Success: " + result;
             }
             catch (Exception ex)
             {
