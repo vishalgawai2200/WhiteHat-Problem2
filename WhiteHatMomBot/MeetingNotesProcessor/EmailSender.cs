@@ -76,32 +76,32 @@ namespace MeetingNotesProcessor
                 if (emailRecipients == null) throw new Exception($"Email recipient list is emppty");
 
                 EmailMessage emailMessage = new EmailMessage(senderMailAddr, emailContent, emailRecipients);
-                //var emailResult = emailClient.SendAsync(emailMessage, CancellationToken.None);
+                var emailResult = emailClient.SendAsync(emailMessage, CancellationToken.None);
 
 
-                SendEmailResult emailResult = emailClient.Send(emailMessage, CancellationToken.None);
+                //SendEmailResult emailResult = emailClient.Send(emailMessage, CancellationToken.None);
 
-                _logger.LogInformation($"email messageId - {emailResult.MessageId}");
+                //_logger.LogInformation($"email messageId - {emailResult.MessageId}");
 
-                //Getting the status of the email
+                ////Getting the status of the email
 
-                Response<SendStatusResult> messageStatus = null;
-                messageStatus = emailClient.GetSendStatus(emailResult.MessageId);
-                _logger.LogInformation($"MessageStatus = {messageStatus.Value.Status}");
-                TimeSpan duration = TimeSpan.FromMinutes(3);
-                long start = DateTime.Now.Ticks;
-                do
-                {
-                    messageStatus = emailClient.GetSendStatus(emailResult.MessageId);
-                    if (messageStatus.Value.Status != SendStatus.Queued)
-                    {
-                        _logger.LogInformation($"MessageStatus = {messageStatus.Value.Status}");
-                        break;
-                    }
-                    Thread.Sleep(10000);
-                    _logger.LogInformation($"...");
+                //Response<SendStatusResult> messageStatus = null;
+                //messageStatus = emailClient.GetSendStatus(emailResult.MessageId);
+                //_logger.LogInformation($"MessageStatus = {messageStatus.Value.Status}");
+                //TimeSpan duration = TimeSpan.FromMinutes(3);
+                //long start = DateTime.Now.Ticks;
+                //do
+                //{
+                //    messageStatus = emailClient.GetSendStatus(emailResult.MessageId);
+                //    if (messageStatus.Value.Status != SendStatus.Queued)
+                //    {
+                //        _logger.LogInformation($"MessageStatus = {messageStatus.Value.Status}");
+                //        break;
+                //    }
+                //    Thread.Sleep(10000);
+                //    _logger.LogInformation($"...");
 
-                } while (DateTime.Now.Ticks - start < duration.Ticks);
+                //} while (DateTime.Now.Ticks - start < duration.Ticks);
 
 
                 return true;
