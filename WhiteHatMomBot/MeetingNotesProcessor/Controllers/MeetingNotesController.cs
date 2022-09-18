@@ -29,10 +29,12 @@ namespace MeetingNotesProcessor.Controllers
         {
             try
             {
+                _logger.LogInformation($"Adding note for session id:{sessionId} Note = {note}");
                 return Ok(_noteRepository.AddNote(sessionId, note));
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, ex.Message, null);
                 return Problem(detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
@@ -43,11 +45,12 @@ namespace MeetingNotesProcessor.Controllers
         {
             try
             {
+                _logger.LogInformation($"Deleting note for session id:{sessionId} Index = {index}");
                 return Ok(_noteRepository.DeleteNote(sessionId, index));
             }
             catch (Exception ex)
             {
-
+                _logger.LogError(ex, ex.Message, null);
                 return Problem(detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
@@ -58,10 +61,12 @@ namespace MeetingNotesProcessor.Controllers
         {
             try
             {
+                _logger.LogInformation($"Getting mom details for session id:{sessionId}");
                 return Ok(_noteRepository.GetMoM(sessionId));
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, ex.Message, null);
                 return Problem(detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
             }          
         }
@@ -72,12 +77,17 @@ namespace MeetingNotesProcessor.Controllers
         {
             try
             {
+                _logger.LogInformation($"Getting mom details for session id:{sessionId}");
                 var mom = _noteRepository.GetMoM(sessionId);
                 mom.Subject = $"WhiteHatBot-MOM-{sessionId}-{DateTime.Now}";
-                return Ok(_emailSender.SendMail(mom));
+                _logger.LogInformation($"sending email for session id:{sessionId}");
+                var result = _emailSender.SendMail(mom);
+                _logger.LogInformation($"sent email for session id:{sessionId}. Result = {result}");
+                return Ok(result);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, ex.Message, null);
                 return Problem(detail:ex.Message, statusCode: StatusCodes.Status500InternalServerError); 
             }
         }
@@ -95,12 +105,15 @@ namespace MeetingNotesProcessor.Controllers
                 if (mom == null)
                     throw new Exception($"Unable to find minutes for session id{sessionId}");
 
-                mom.ParticipantsColSeparated=participants;
-              _noteRepository.UpdateMom(mom);
+                _logger.LogInformation($"Adding participants for session id:{sessionId} Note = {participants}");
+
+                mom.ParticipantsColSeparated = participants;
+                _noteRepository.UpdateMom(mom);
                 return true;
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, ex.Message, null);
                 return Problem(detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }

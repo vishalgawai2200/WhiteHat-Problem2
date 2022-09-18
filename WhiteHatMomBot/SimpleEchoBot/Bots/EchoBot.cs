@@ -6,6 +6,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Configuration;
 using Microsoft.Bot.Schema;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -20,10 +21,13 @@ namespace SimpleEchoBot.Bots
 
         private IStatePropertyAccessor<ConversationData> _conversationStateAccessors;
 
-        public EchoBot(ConversationState conversationState, UserState userState)
+        private ILogger<EchoBot> _logger;
+
+        public EchoBot(ConversationState conversationState, UserState userState, ILogger<EchoBot> logger)
         {
             _conversationState = conversationState;
             _userState = userState;
+            _logger = logger;
 
         }
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -34,9 +38,10 @@ namespace SimpleEchoBot.Bots
 
             if(conversationData.SessionId == null)
             {
+                
                 conversationData.SessionId = Guid.NewGuid().ToString();
-                
-                
+                _logger.LogInformation($"Create and set session id = {conversationData.SessionId}");
+
             }
 
             var momProcessorClient  = new MomProcessorClient(conversationData.SessionId);
@@ -53,6 +58,7 @@ namespace SimpleEchoBot.Bots
             try
             {
                 var action = subs[0].ToUpperInvariant().Trim();
+                action = action.Replace("WHITEHATECHOBOT", string.Empty).Trim();
                 
                 switch (action)
                 {
@@ -65,7 +71,9 @@ namespace SimpleEchoBot.Bots
                         momProcessorClient.DeleteNode(index);
                         break;
                     case "EMAILMOM":
+                        _logger.LogInformation($"sending mail for {conversationData.SessionId}");
                         momProcessorClient.SendMail();
+                        result = $"Sent email with subject: WhiteHatBot-MOM-{conversationData.SessionId}-{DateTime.Now}";
                         break;
                     case "GETMOM":
                         var notes = momProcessorClient.GetMinutesOfMeeting();
@@ -79,7 +87,8 @@ namespace SimpleEchoBot.Bots
                         conversationData.SessionId = null;                        
                         break;
                     default:
-                        result = "No action performed";
+                        _logger.LogInformation($"no action performed - action : {action}");
+                        result = $"No action performed - action : {action}";
                         break;
                 }
 
@@ -87,6 +96,7 @@ namespace SimpleEchoBot.Bots
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, ex.Message, null);
                 result = ex.Message;
             }
 
