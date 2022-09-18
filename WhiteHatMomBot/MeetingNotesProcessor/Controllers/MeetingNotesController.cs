@@ -105,7 +105,7 @@ namespace MeetingNotesProcessor.Controllers
                 if (mom == null)
                     throw new Exception($"Unable to find minutes for session id{sessionId}");
 
-                _logger.LogInformation($"Adding participants for session id:{sessionId} Note = {participants}");
+                _logger.LogInformation($"Adding participants for session id:{sessionId} participants = {participants}");
 
                 mom.ParticipantsColSeparated = participants;
                 _noteRepository.UpdateMom(mom);

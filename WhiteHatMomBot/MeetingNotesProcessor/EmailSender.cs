@@ -12,7 +12,12 @@ namespace MeetingNotesProcessor
     {
         string connectionString = @"endpoint=https://bot-framework-communication-resource.communication.azure.com/;accesskey=VOO8D+jwocyGSmYaueFl2JBzZsIqDN8oZMu9hw5P6nFrcClFmpnUvqVtMdC7JUpQwATIZIKXL74gCsN3stNsMg==";
         string senderMailAddr = @"donotreply@2a497475-2a9d-43f3-9c0c-a8b07706d60e.azurecomm.net";
-        //private readonly ILogger<EmailSender> _logger;
+        private readonly ILogger<EmailSender> _logger;
+
+        public EmailSender(ILogger<EmailSender> logger)
+        {
+            _logger = logger;
+        }
 
         public bool SendTestMail(string subject)
         {
@@ -27,30 +32,31 @@ namespace MeetingNotesProcessor
             List<EmailAddress> emailAddresses = new List<EmailAddress> { new EmailAddress("vishal.gawai@gmail.com") { DisplayName = "Vishal Gawai" } };
             EmailRecipients emailRecipients = new EmailRecipients(emailAddresses);
             EmailMessage emailMessage = new EmailMessage(senderMailAddr, emailContent, emailRecipients);
-            var emailResult = emailClient.SendAsync(emailMessage, CancellationToken.None);
+            //var emailResult = emailClient.SendAsync(emailMessage, CancellationToken.None);
 
-            //_logger.Info($"MessageId = {emailResult.MessageId}");
+            SendEmailResult emailResult = emailClient.Send(emailMessage, CancellationToken.None);
 
+            _logger.LogInformation($"email messageId - {emailResult.MessageId}");
 
-            ////Getting the status of the email
+            //Getting the status of the email
 
-            //Response<SendStatusResult> messageStatus = null;
-            //messageStatus = emailClient.GetSendStatus(emailResult.MessageId);
-            ////Console.WriteLine($"MessageStatus = {messageStatus.Value.Status}");
-            //TimeSpan duration = TimeSpan.FromMinutes(3);
-            //long start = DateTime.Now.Ticks;
-            //do
-            //{
-            //    messageStatus = emailClient.GetSendStatus(emailResult.MessageId);
-            //    if (messageStatus.Value.Status != SendStatus.Queued)
-            //    {
-            //        //Console.WriteLine($"MessageStatus = {messageStatus.Value.Status}");
-            //        break;
-            //    }
-            //    Thread.Sleep(10000);
-            //    Console.WriteLine($"...");
+            Response<SendStatusResult> messageStatus = null;
+            messageStatus = emailClient.GetSendStatus(emailResult.MessageId);
+            _logger.LogInformation($"MessageStatus = {messageStatus.Value.Status}");
+            TimeSpan duration = TimeSpan.FromMinutes(3);
+            long start = DateTime.Now.Ticks;
+            do
+            {
+                messageStatus = emailClient.GetSendStatus(emailResult.MessageId);
+                if (messageStatus.Value.Status != SendStatus.Queued)
+                {
+                    _logger.LogInformation($"MessageStatus = {messageStatus.Value.Status}");
+                    break;
+                }
+                Thread.Sleep(10000);
+               _logger.LogInformation($"...");
 
-            //} while (DateTime.Now.Ticks - start < duration.Ticks);
+            } while (DateTime.Now.Ticks - start < duration.Ticks);
 
             return true;
 
@@ -58,19 +64,53 @@ namespace MeetingNotesProcessor
 
         public bool SendMail(Minute mom)
         {
-            EmailClient emailClient = new EmailClient(connectionString);
-            //Replace with your domain and modify the content, recipient details as required
+            try
+            {
+                EmailClient emailClient = new EmailClient(connectionString);
+                //Replace with your domain and modify the content, recipient details as required
 
 
-            EmailContent emailContent = new EmailContent($"{mom.Subject}");
-            emailContent.PlainText = GetEmailBody(mom);
-            var emailRecipients = GetEmailRecipients(mom);
-            if (emailRecipients == null) throw new Exception($"Email recipient list is emppty");
+                EmailContent emailContent = new EmailContent($"{mom.Subject}");
+                emailContent.PlainText = GetEmailBody(mom);
+                var emailRecipients = GetEmailRecipients(mom);
+                if (emailRecipients == null) throw new Exception($"Email recipient list is emppty");
 
-            EmailMessage emailMessage = new EmailMessage(senderMailAddr, emailContent, emailRecipients);
-            var emailResult = emailClient.SendAsync(emailMessage, CancellationToken.None);
+                EmailMessage emailMessage = new EmailMessage(senderMailAddr, emailContent, emailRecipients);
+                //var emailResult = emailClient.SendAsync(emailMessage, CancellationToken.None);
 
-            return true;
+
+                SendEmailResult emailResult = emailClient.Send(emailMessage, CancellationToken.None);
+
+                _logger.LogInformation($"email messageId - {emailResult.MessageId}");
+
+                //Getting the status of the email
+
+                Response<SendStatusResult> messageStatus = null;
+                messageStatus = emailClient.GetSendStatus(emailResult.MessageId);
+                _logger.LogInformation($"MessageStatus = {messageStatus.Value.Status}");
+                TimeSpan duration = TimeSpan.FromMinutes(3);
+                long start = DateTime.Now.Ticks;
+                do
+                {
+                    messageStatus = emailClient.GetSendStatus(emailResult.MessageId);
+                    if (messageStatus.Value.Status != SendStatus.Queued)
+                    {
+                        _logger.LogInformation($"MessageStatus = {messageStatus.Value.Status}");
+                        break;
+                    }
+                    Thread.Sleep(10000);
+                    _logger.LogInformation($"...");
+
+                } while (DateTime.Now.Ticks - start < duration.Ticks);
+
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message, null);
+                throw;
+            }
         }
 
         private string GetEmailBody(Minute mom)

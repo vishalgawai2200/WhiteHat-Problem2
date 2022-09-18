@@ -9,6 +9,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,8 +47,10 @@ namespace SimpleEchoBot.Bots
 
             var momProcessorClient  = new MomProcessorClient(conversationData.SessionId);
 
+
             //var replyText = $"Echo: {turnContext.Activity.Text}";
 
+            turnContext.Activity.TextFormat = "xml";
             string text = turnContext.Activity.Text;  //ADDNOTE: TEST1  DELETENODE: 1
             var subs = text.Split(':');
 
@@ -81,6 +84,14 @@ namespace SimpleEchoBot.Bots
                         break;
                     case "ADDPARTICIPANTS":
                         string participants = subs[1];
+                        _logger.LogInformation($@"Add Participants: {participants}");
+
+                        if(subs.Length >  2)  //href handling from skype
+                        {
+                            var emailId = subs[2];
+                            participants = emailId.Substring(0, emailId.IndexOf('"'));
+                        }
+
                         momProcessorClient.AddParticipants(participants);
                         break;
                     case "RESET":
