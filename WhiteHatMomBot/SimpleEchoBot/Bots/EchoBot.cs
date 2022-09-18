@@ -76,8 +76,7 @@ namespace SimpleEchoBot.Bots
                         momProcessorClient.AddParticipants(participants);
                         break;
                     case "RESET":
-                        conversationData.MoMProcessorClient = new MomProcessorClient(Guid.NewGuid().ToString());
-                        await _conversationStateAccessors.SetAsync(turnContext, conversationData);
+                        conversationData.SessionId = null;                        
                         break;
                     default:
                         result = "No action performed";
