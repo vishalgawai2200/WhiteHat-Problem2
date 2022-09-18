@@ -1,4 +1,5 @@
 using EFCoreInMemoryDbDemo;
+using MeetingNotesProcessor;
 using MeetingNotesProcessor.DataContext;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();    
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

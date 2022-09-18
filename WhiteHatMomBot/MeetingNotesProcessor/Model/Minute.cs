@@ -12,7 +12,7 @@ namespace MeetingNotesProcessor.Model
     //- Task with user Mapping
     public class Minute
     {
-        public Minute(long sessionId)
+        public Minute(string sessionId)
         {
             SessionId = sessionId;
             Subject = string.Empty;
@@ -22,7 +22,7 @@ namespace MeetingNotesProcessor.Model
         }
 
         [Key]
-        public long SessionId { get; set; }
+        public string SessionId { get; set; }
         public string Subject { get; set; }
         public string ParticipantsColSeparated { get; set; }        
         public List<string> Notes { get; set; }
