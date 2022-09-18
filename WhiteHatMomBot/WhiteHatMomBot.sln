@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingNotesProcessor", "Me
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailProcessor", "EmailProcessor\EmailProcessor.csproj", "{9BC3916C-0D2E-4275-B00C-8FAC298CE5F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleEchoBot", "SimpleEchoBot\SimpleEchoBot.csproj", "{707E3B11-D81D-47A3-82E9-65A76E596199}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleEchoBot", "SimpleEchoBot\SimpleEchoBot.csproj", "{707E3B11-D81D-47A3-82E9-65A76E596199}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleCoreBot", "SimpleCoreBot\SimpleCoreBot.csproj", "{1725576F-805B-4C26-8D3D-01AA53A05839}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleCoreBot", "SimpleCoreBot\SimpleCoreBot.csproj", "{1725576F-805B-4C26-8D3D-01AA53A05839}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

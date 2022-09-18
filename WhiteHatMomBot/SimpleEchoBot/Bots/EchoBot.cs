@@ -4,7 +4,9 @@
 // Generated with Bot Builder V4 SDK Template for Visual Studio EchoBot v4.16.0
 
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Configuration;
 using Microsoft.Bot.Schema;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,10 +15,85 @@ namespace SimpleEchoBot.Bots
 {
     public class EchoBot : ActivityHandler
     {
+        private BotState _conversationState;
+        private BotState _userState;
+
+        private IStatePropertyAccessor<ConversationData> _conversationStateAccessors;
+
+        public EchoBot(ConversationState conversationState, UserState userState)
+        {
+            _conversationState = conversationState;
+            _userState = userState;
+
+        }
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            var replyText = $"Echo: {turnContext.Activity.Text}";
-            await turnContext.SendActivityAsync(MessageFactory.Text(replyText, replyText), cancellationToken);
+
+            var conversationStateAccessors = _conversationState.CreateProperty<ConversationData>(nameof(ConversationData));
+            var conversationData = await conversationStateAccessors.GetAsync(turnContext, () => new ConversationData());
+
+            if(conversationData.SessionId == null)
+            {
+                conversationData.SessionId = Guid.NewGuid().ToString();
+                
+                
+            }
+
+            var momProcessorClient  = new MomProcessorClient(conversationData.SessionId);
+
+            //var replyText = $"Echo: {turnContext.Activity.Text}";
+
+            string text = turnContext.Activity.Text;  //ADDNOTE: TEST1  DELETENODE: 1
+            var subs = text.Split(':');
+
+            if (subs == null || subs.Length == 0)
+                return;
+
+            string result = string.Empty;
+            try
+            {
+                var action = subs[0].ToUpperInvariant().Trim();
+                
+                switch (action)
+                {
+                    case "ADDNOTE":
+                        string note = subs[1];
+                        momProcessorClient.AddNote(note);
+                        break;
+                    case "DELETENODE":
+                        int index = int.Parse(subs[1]);
+                        momProcessorClient.DeleteNode(index);
+                        break;
+                    case "EMAILMOM":
+                        momProcessorClient.SendMail();
+                        break;
+                    case "GETMOM":
+                        var notes = momProcessorClient.GetMinutesOfMeeting();
+                        result = "\n" + string.Join("\n", notes);
+                        break;
+                    case "ADDPARTICIPANTS":
+                        string participants = subs[1];
+                        momProcessorClient.AddParticipants(participants);
+                        break;
+                    case "RESET":
+                        conversationData.MoMProcessorClient = new MomProcessorClient(Guid.NewGuid().ToString());
+                        await _conversationStateAccessors.SetAsync(turnContext, conversationData);
+                        break;
+                    default:
+                        result = "No action performed";
+                        break;
+                }
+
+                result = "Sucess: " + result;
+            }
+            catch (Exception ex)
+            {
+                result = ex.Message;
+            }
+
+            //await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
+
+            await turnContext.SendActivityAsync(MessageFactory.Text(result), cancellationToken);
         }
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
@@ -30,5 +107,31 @@ namespace SimpleEchoBot.Bots
                 }
             }
         }
+
+
+
+        public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (turnContext.Activity.Type == "conversationUpdate")
+            {
+                var conversationStateAccessors = _conversationState.CreateProperty<ConversationData>(nameof(ConversationData));
+                var conversationData = await conversationStateAccessors.GetAsync(turnContext, () => new ConversationData());
+
+                if (conversationData.SessionId == null)
+                {
+                    conversationData.SessionId = Guid.NewGuid().ToString();
+
+                }
+            }
+
+
+            await base.OnTurnAsync(turnContext, cancellationToken);
+
+            //// Save any state changes that might have occurred during the turn.
+            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
+            //await _userState.SaveChangesAsync(turnContext, false, cancellationToken);
+        }
+
+
     }
 }
